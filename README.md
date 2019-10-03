@@ -66,8 +66,7 @@ Results
 
 ![figure2](./imgs/figure2.png)
 
-Notice (2019-10-2)
---
+#### Prune and retrain for each single layer of VGG-16 on CIFAR-10
+* This graph was created in [jupyter notebook](https://github.com/tyui592/notepad/blob/master/pruning_filters_for_efficient_convets/prune_filter_for_efficient_convnets.ipynb). You can make the graph yourself.
 
-* Test accuracy result graph of the retrained pruned network will be uploaded.
-
+![figure3](./imgs/figure3.png)
