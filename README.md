@@ -1,6 +1,6 @@
-Pytorch implementation of "Pruning Filters For Efficient ConvNets"
+Pruning Filters For Efficient ConvNets
 ==
-**This is the Pytorch Implementation of pruning VGG on CIFAR-10 Data set**
+**Unofficial PyTorch implementation of pruning VGG on CIFAR-10 Data set**
 
 **Reference**: [Pruning Filters For Efficient ConvNets, ICLR2017](https://arxiv.org/abs/1608.08710)
 
