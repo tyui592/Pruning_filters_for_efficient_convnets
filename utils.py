@@ -2,7 +2,8 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 
-class AverageMeter(object):    
+class AverageMeter(object):
+    '''更新类'''
     def __init__(self):
         self.reset()
 

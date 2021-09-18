@@ -44,7 +44,7 @@ def build_parser():
                     help='number of epoch for training network', default=350)
     
     parser.add_argument('--batch-size', type=int,
-                    help='batch size', default=128)
+                    help='batch size', default=256)
 
     parser.add_argument('--num-workers', type=int,
                     help='number of workers for data loader', default=2)
@@ -106,17 +106,18 @@ def build_parser():
 
 def get_parameter():
     parser = build_parser()
+    # 解析参数
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_no)
-    
+    # 参数展示
     print("-*-"*10 + "\n\tArguments\n" + "-*-"*10)
     for key,value in vars(args).items():
         print("%s: %s"%(key, value))
 
     if not os.path.exists(args.save_path):
         os.makedirs(args.save_path)
-        print("Make dir: ",args.save_path)
-
+        print("Make dir: ", args.save_path)
+    # 把模型等相关参数保存到相应地址，
     torch.save(args, args.save_path+"arguments.pth")
 
     return args
