@@ -1,3 +1,4 @@
+# 我进行了全中文代码注释，适合初学者
 Pruning Filters For Efficient ConvNets
 ==
 **Unofficial PyTorch implementation of pruning VGG on CIFAR-10 Data set**
