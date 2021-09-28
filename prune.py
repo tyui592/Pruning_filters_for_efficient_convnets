@@ -45,7 +45,7 @@ def prune_step(network, prune_layers, prune_channels, independent_prune_flag):
     # 如果是1，表示要把前面的featuremaps给剪掉。
     residue = None # residue is need to prune by 'independent strategy' 残差
     for i in range(len(network.features)):
-        # 循环所有层，提取卷积层
+        # 上：循环所有层，下：提取卷积层
         if isinstance(network.features[i], torch.nn.Conv2d):
             if dim == 1:
                 # 当前是1，表明上一层的filters被剪了，所以这一层要将inchannel的filters按照channel_index同时给剪掉
@@ -55,7 +55,8 @@ def prune_step(network, prune_layers, prune_channels, independent_prune_flag):
                 dim ^= 1
                 # 当前是0，表明我们这一层要把输出的filters给剪掉。同时得到channel_index
 
-            if 'conv%d'%conv_count in prune_layers:
+            if 'conv%d' % conv_count in prune_layers:
+                # 如果这层卷积层需要被剪枝，则进入
             # 读取需要被剪枝的卷积层层号
                 # 排序输出需要剪掉的fliter索引
                 channel_index = get_channel_index(network.features[i].weight.data, prune_channels[count], residue)
@@ -90,19 +91,21 @@ def get_channel_index(kernel, num_elimination, residue=None):
         sum_of_kernel += torch.sum(torch.abs(residue.view(residue.size(0), -1)), dim=1)
     
     vals, args = torch.sort(sum_of_kernel)
-
+    # 取前num_elimination个，.tolist()变列表
     return args[:num_elimination].tolist()
 
 def index_remove(tensor, dim, index, removed=False):
     # 根据index进行剪枝
     if tensor.is_cuda:
         tensor = tensor.cpu()
+    # 计算卷积核数量
     size_ = list(tensor.size())
     new_size = tensor.size(dim) - len(index)
     size_[dim] = new_size
     new_size = size_
-
+    # 生成序列，剪去应该剪的索引
     select_index = list(set(range(tensor.size(dim))) - set(index))
+    # 提取剩下来的参数
     new_tensor = torch.index_select(tensor, dim, torch.tensor(select_index))
     
     if removed:
@@ -111,18 +114,33 @@ def index_remove(tensor, dim, index, removed=False):
     return new_tensor
 
 def get_new_conv(conv, dim, channel_index, independent_prune_flag=False):
+    # 改卷积层的输入输出大小
     if dim == 0:
+        # 修剪卷积核
         new_conv = torch.nn.Conv2d(in_channels=conv.in_channels,
                                    out_channels=int(conv.out_channels - len(channel_index)),
                                    kernel_size=conv.kernel_size,
                                    stride=conv.stride, padding=conv.padding, dilation=conv.dilation)
         
         new_conv.weight.data = index_remove(conv.weight.data, dim, channel_index)
+
+        # print("*********", conv.weight.data.size())
+        # print("*********", conv.weight.data.size(0))
+        # print("*********", conv.weight.data.size(1))
+        # print("*********", conv.weight.data.size()[0])
+        # print("*********", conv.weight.data.size()[1])
+        # ** ** ** ** *torch.Size([64, 3, 3, 3])
+        # ** ** ** ** *64
+        # ** ** ** ** *3
+        # ** ** ** ** *64
+        # ** ** ** ** *3
+
         new_conv.bias.data = index_remove(conv.bias.data, dim, channel_index)
 
         return new_conv
 
     elif dim == 1:
+        # 修剪上一层输入
         new_conv = torch.nn.Conv2d(in_channels=int(conv.in_channels - len(channel_index)),
                                    out_channels=conv.out_channels,
                                    kernel_size=conv.kernel_size,
