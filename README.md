@@ -4,7 +4,6 @@ Pruning Filters For Efficient ConvNets
 
 **Reference**: [Pruning Filters For Efficient ConvNets, ICLR2017](https://arxiv.org/abs/1608.08710)
 
-**Contact**: Minseong Kim (tyui592@gmail.com)
 
 
 Requirements
