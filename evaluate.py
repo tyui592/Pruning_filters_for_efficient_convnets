@@ -61,6 +61,11 @@ def accuracy(output, target, topk=(1,)):
     """
         Computes the precision@k for the specified values of k
         ref: https://github.com/chengyangfu/pytorch-vgg-cifar10
+        Top-1，Top-5中的Top指的是一个图片中的概率前1和前5，不是所有图片中预测最好的1个或5个图片
+        比如一共需要分10类，每次分类器的输出结果都是10个相加为1的概率值，
+        Top1就是这十个值中最大的那个概率值对应的分类恰好正确的频率，
+        而Top5则是在十个概率值中从大到小排序出前五个，然后看看这前五个分类中是否存在那个正确分类，再计算频率。
+
     """
     maxk = max(topk)
     batch_size = target.size(0)
@@ -71,6 +76,6 @@ def accuracy(output, target, topk=(1,)):
 
     res = []
     for k in topk:
-        correct_k = correct[:k].view(-1).float().sum(0)
+        correct_k = correct[:k].contiguous().view(-1).float().sum(0)
         res.append(correct_k.mul_(100.0 / batch_size))
     return res
